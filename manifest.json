@@ -1,0 +1,22 @@
+﻿{
+  "Name": "MarvalSoftware.Plugins.ChatGPT2",
+  "Organisation": "MarvalSoftware",
+  "DisplayName": "@@PluginDisplayname",
+  "Icon": "img/chatgpt_16.png",
+  "Version": "0.1.1",
+  "SupportedVersions": [
+	"0.0.0"
+  ],
+  "Pages": [
+    "Request.aspx"
+  ],
+  "HtmlImportFile": "MarvalSoftware.Plugins.ChatGPT.html",
+  "TagName": "marval-software-plugins-chatgpt",
+  "GlobalSettings": [
+    "@@ChatGPTAPIKey",
+    "@@MSMAPIKey",
+    "@@APIEndpoint",
+    "@@DictionaryID",
+    "@@DBConnectionString"
+  ]
+}

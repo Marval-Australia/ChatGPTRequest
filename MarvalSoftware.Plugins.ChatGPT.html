@@ -1,0 +1,808 @@
+﻿<script type="text/javascript" src="template.js"></script>
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"
+    integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+<template>
+    <style>
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            text-align: center;
+        }
+
+        /* Styles for the popup content */
+        .popup-content {
+            background-color: #fff;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Style for the button-like links */
+        .button-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff !important;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Style for the close button */
+        .button-link#closePopup {
+            margin-top: 10px;
+        }
+
+
+
+
+        .MarvalSoftware-ChatGPT {
+            display: none;
+        }
+
+        .window .MarvalSoftware-ChatGPT {
+            display: block;
+        }
+
+        .MarvalSoftware-ChatGPT {
+            position: absolute;
+            top: 26px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .MarvalSoftware-ChatGPT a {
+            color: #3B73AF;
+        }
+
+        .MarvalSoftware-ChatGPT>.header {
+            position: absolute;
+            top: 20px;
+            left: 10px;
+            right: 10px;
+            line-height: 30px;
+        }
+
+        .MarvalSoftware-ChatGPT>.header>a {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            text-decoration: none;
+        }
+
+        .MarvalSoftware-ChatGPT>.issues {
+            position: absolute;
+            top: 50px;
+            bottom: 110px;
+            left: 10px;
+            right: 10px;
+            overflow: auto;
+            border: 1px solid #000;
+            background: no-repeat center center;
+        }
+
+        .MarvalSoftware-ChatGPT>.issues>.issue {
+            position: relative;
+            padding: 10px;
+            height: 30px;
+            line-height: 30px;
+        }
+
+        .MarvalSoftware-ChatGPT>.issues>.issue:nth-child(even) {
+            background: #EBF2F9;
+        }
+
+        .MarvalSoftware-ChatGPT>.issues>.issue>.left {
+            position: absolute;
+            left: 0;
+            right: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .MarvalSoftware-ChatGPT>.issues>.issue>.left>* {
+            margin-left: 10px;
+        }
+
+        .MarvalSoftware-ChatGPT>.issues>.issue>.left>a {
+            text-decoration: none;
+        }
+
+        .MarvalSoftware-ChatGPT>.issues>.issue>.left>.status {
+            display: inline-block;
+            padding: 0 10px;
+            border: 1px solid #DDD;
+            border-radius: 5px;
+            background: #FFF;
+        }
+
+        .MarvalSoftware-ChatGPT>.issues>.issue>.right {
+            position: absolute;
+            right: 0;
+            width: 200px;
+        }
+
+        .MarvalSoftware-ChatGPT>.issues>.issue>.right>.assignee {
+            box-sizing: border-box;
+            position: absolute;
+            right: 60px;
+            padding: 0 10px;
+            width: 140px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+        }
+
+        .MarvalSoftware-ChatGPT>.issues>.issue>.right>.unlink {
+            position: absolute;
+            right: 10px;
+            width: 50px;
+            text-align: center;
+            text-decoration: none;
+            color: #F00;
+        }
+
+        .MarvalSoftware-ChatGPT>.newIssue {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            height: 100px;
+        }
+
+        .MarvalSoftware-ChatGPT>.newIssue>h1 {
+            line-height: 30px;
+            bottom: 60px;
+            position: absolute;
+        }
+
+        .MarvalSoftware-ChatGPT>.newIssue>.issueTypes {
+            position: absolute;
+            bottom: 50px;
+        }
+
+        .MarvalSoftware-ChatGPT>.newIssue>.issueTypes>.typeLoading {
+            position: absolute;
+            background-repeat: no-repeat;
+            width: 20px;
+            height: 20px;
+        }
+
+        .MarvalSoftware-ChatGPT>.newIssue>.issueTypes>.typeLoading>select {
+            box-sizing: border-box;
+            padding: 2px;
+            height: 22px;
+            max-width: 110px;
+            min-width: 110px;
+            width: 110px;
+            border: 1px solid #CCC;
+            position: absolute;
+        }
+
+        .MarvalSoftware-ChatGPT>.newIssue>.issueSummaryWrapper {
+            position: absolute;
+            left: 120px;
+            right: 90px;
+            bottom: 28px;
+        }
+
+        .MarvalSoftware-ChatGPT>.newIssue>.issueSummaryWrapper>input {
+            box-sizing: border-box;
+            padding: 2px;
+            height: 22px;
+            width: 100%;
+            border: 1px solid #CCC;
+        }
+
+        .MarvalSoftware-ChatGPT>.newIssue>button {
+            box-sizing: border-box;
+            position: absolute;
+            right: 0;
+            padding: 2px;
+            height: 22px;
+            width: 80px;
+            border: 1px solid #CCC;
+            border-radius: 2px;
+            /*background: #F5F5F5; */
+            bottom: 28px;
+        }
+
+        .MarvalSoftware-ChatGPT>.newIssue>.issueOptions {
+            position: absolute;
+            bottom: 0px;
+            left: 0px;
+        }
+
+        .MarvalSoftware-ChatGPT>.newIssue>.issueOptions>a {
+            vertical-align: middle;
+            font-size: 13px;
+            text-decoration: none;
+            color: #3B73AF;
+            margin-right: 10px;
+        }
+
+        .MarvalSoftware-ChatGPT>.newIssue>.issueOptions>label {
+            vertical-align: middle;
+            margin-bottom: 2px;
+            color: #9b9da0;
+        }
+
+        .MarvalSoftware-ChatGPT>.newIssue>.issueOptions>input {
+            vertical-align: middle;
+        }
+
+        .attachmentHeader {
+            font-size: 13px;
+        }
+
+        .attachmentOptions {
+            margin-bottom: 5px;
+        }
+
+        .attachmentCheckboxes {
+            height: 200px;
+            overflow: auto;
+        }
+
+        .attachmentCheckboxes div {
+            margin-top: 10px;
+        }
+
+        .attachmentCheckboxes div input {
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        #map {
+            height: 100%;
+        }
+    </style>
+    <div class="MarvalSoftware-ChatGPT">
+
+        <div class="popup-overlay" id="popup" style="display: none;">
+            <div class="popup-content">
+                <!-- Content for the popup -->
+                <h2>Update Request</h2>
+                <p>Resolution Dictionary </p>
+                <select id="classificationDictionarySelect">
+                </select><br>
+                <label>
+                    <input type="checkbox" id="populateResponse"> Populate Request Outcome With ChatGPT Response
+                </label><br>
+
+                <a href="#" id="updateRequest" class="button-link">Update Request</a>
+                <a href="#" id="solveRequest" class="button-link">Update and Solve Request</a>
+                <a href="#" id="closePopup" class="button-link">Close</a>
+            </div>
+        </div>
+
+        <div class="header">
+            <h1>@@LinkedIssuesTitle</h1>
+            <!-- ctl00_quickMenu_notes -->
+            <br><br>
+
+            <br><br>
+            <a id="copynotesoutput">Copy ChatGPT Response to notes</a>
+            <br><br>
+        </div>
+        <!-- <a id="openPopup">Solve ticket with -->
+        <!-- resolution</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -->
+        <div id="issueselement" class="issues">
+     
+        </div>
+        <div class="newIssue">
+           
+            <button style="display:none" disabled>@@Create</button>
+            <div style="display:none" class="issueOptions">
+                <a href="javascript:void(0);" class="selectAttachments"></a>
+                <input type="checkbox" disabled />
+                <label>@@MSMContactReporter</label>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template class="issueTemplate">
+    <div class="issue">
+        <div class="left">
+            <a href="javascript:void(0);" target="_blank" class="number"></a>
+            <span class="status"></span>
+            <span class="summary"></span>
+        </div>
+        <div class="right">
+            <span class="assignee"></span>
+            <a href="javascript:void(0);" class="unlink">@@Unlink</a>
+        </div>
+    </div>
+</template>
+<template class="errorTemplate">
+    <style>
+        .MarvalSoftware-ChatGPT-Errors h3,
+        .MarvalSoftware-ChatGPT-Errors h4 {
+            padding: 8px 0 8px 0;
+        }
+
+        .chatgptConfig>li {
+            display: none;
+        }
+    </style>
+    <div class="MarvalSoftware-ChatGPT-AttributeError">
+
+        <div class="title">
+            <h3>There was an error reading information from the attribute.</h3>
+        </div>
+        <div>
+            <h4></h4>
+        </div>
+    </div>
+    <div class="MarvalSoftware-ChatGPT-Errors">
+
+        <div class="title">
+            <h3>@@EnsureConfigurationSettingsCorrect</h3>
+        </div>
+        <div>
+            <ul class="chatgptConfig">
+                <li id="chatgptBaseUrl">@@ChatGPTAPIKey</li>
+                <li id="chatgptCustomFieldID">@@MSMAPIKey</li>
+                <li id="chatgptCustomFieldName">@@APIEndpoint</li>
+            </ul>
+            <h4></h4>
+        </div>
+    </div>
+</template>
+<template class="attachmentPopupTemplate">
+    <div class="MarvalSowftware-ChatGPT-Popup-Attachments">
+        <p class="attachmentHeader">@@SelectRequestAttachmentHeader</p>
+        <br />
+        <div class="attachmentOptions">
+            <a href="javascript:void(0)" class="selectAll">@@SelectAllOption</a>
+            <span> | </span>
+            <a href="javascript:void(0)" class="selectNone">@@SelectNoneOption</a>
+        </div>
+        <div class="attachmentCheckboxes"></div>
+    </div>
+</template>
+<template class="attachmentTemplate">
+    <div class="MarvalSowftware-ChatGPT-Attachments">
+        <input type="checkbox" class="attachmentCheckbox" />
+        <label class="attachmentLabel"></label>
+    </div>
+</template>
+
+<script>
+    (function () {
+
+        var MarvalSoftware = window.top.MarvalSoftware;
+        var $ = window.top.$;
+
+        MarvalSoftware.Plugins.define("marval-software-plugins-chatgpt",
+            {
+                _pluginPath: null,
+                _requestNumber: null,
+                _requestDescription: null,
+                _element: null,
+                _issuesElement: null,
+                _typeElement: null,
+                _requestID: null,
+                _requestDescription: null,
+                _summaryElement: null,
+                _nextStatesList: null,
+                _createElement: null,
+                _renderIssuesRequest: null,
+                _dictList: null,
+                _typeLoadingElement: null,
+                _contactEmail: null,
+                _contactUsername: null,
+                _canRequestBeSolved: null,
+                _chatGPTText: null,
+                _contactCheckbox: null,
+                _attachments: null,
+                _selectedAttachmentIds: null,
+                _selectAttachmentElement: null,
+                _issueOptionsElement: null,
+                _reporterCheckboxLabel: null,
+                _requestID: null,
+                _reporterCheckboxElement: null,
+                _attachmentsCheckboxList: null,
+
+                init: function () {
+                    this._requestNumber = MarvalSoftware.UI.Controls.ScriptManager.getInstance().getPage().getRequestNumber();
+                    this._requestID = MarvalSoftware.UI.Controls.ScriptManager.getInstance().getPage()._requestId;
+                    this._requestDescription = MarvalSoftware.UI.Controls.ScriptManager.getInstance().getPage()._requestDescription;
+                    this._requestDescription = MarvalSoftware.UI.Controls.ScriptManager.getInstance().getPage().getDescription();
+                    var that = this;
+
+                    $("body").on("click", "#solveRequest", function (e) {
+
+                        $("#popup").hide();
+                        $('#ctl00_cph_dictionary_4_webServiceParameters_trunk').html("ChatGPT");
+                        $("div.content.dropdown.classificationPicker").contents().each(function () {
+                            var text = $(this).text();
+                        })
+                        //$('#ctl00_quickMenu_notes')[0].click();
+                    })
+
+                    $("body").on("click", "#openPopup", function (e) {
+
+                        if (that._canRequestBeSolved == 1) {
+                        } else {
+                            //  var populateResponseSolve = $("#populateResponseSolvelabel");
+                            //  populateResponseSolve.hide();
+                            var solveRequestButton = $('#solveRequest');
+                            solveRequestButton.hide();
+                        }
+                        var selectElement = $("#classificationDictionarySelect");
+                        selectElement.empty();
+                        $.each(that._dictList.RequestParams, function (index, item) {
+                            var option = $("<option>", {
+                                value: item.classificationId,
+                                text: item.description
+                            });
+                            selectElement.append(option);
+                        });
+                        // $("#openPopup").click(function() {
+                        // Show the popup
+
+                        $("body").on('click', '#closePopup', function () {
+
+                            $("#popup").hide();
+                        })
+                        $("#popup").show();
+                        setTimeout(() => {
+                            // $("body").on('click','#closePopup',function(){
+                            //     console.log("Closing popup 1");
+                            //     $("#popup").hide();
+                            // })
+                        }, "500");
+                    });
+
+
+                    $("body").on("click", "#copynotesoutput", function (e) {
+
+                        var newChatGPTText = that._chatGPTText;
+                        $('#ctl00_quickMenu_notes')[0].click();
+                        setTimeout(() => {
+                            $("#ctl00_cph_notes_newNote_richTextEditor_editorElement").contents().find("body").html(newChatGPTText);
+                        }, "500");
+                    });
+                    this._selectedAttachmentIds = [];
+
+                    if (this._requestNumber) {
+                        this._setUpQuickMenu();
+
+                    }
+                },
+                _preProcessResourceString: function (content) {
+                    var resourceTagRegEx = /@@\w+\b/g;
+                    var match = resourceTagRegEx.exec(content);
+                    while (match) {
+                        var foundTag = match[0];
+                        var resourcedKey = this._getString(foundTag);
+                        content = content.replace(foundTag, resourcedKey);
+                        var match = resourceTagRegEx.exec(content);
+                    }
+                    return content;
+                },
+                _ResolveRequest: function () {
+                    var that = this;
+                    $.ajax({
+                        type: "GET",
+                        url: this._getPluginPath() + "handler/ApiHandler.ashx?action=ResolveRequest&requestID=" + that._requestID + "&currentHostname=" + document.location.hostname,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (result) {
+
+                        }.bind(this),
+                        error: function (err) {
+                            console.log("Have failure in _ResolveRequest as ", err);
+                        }.bind(this)
+                    });
+                },
+
+                _getContactUsername: function () {
+                    if (this._contactEmail != null) {
+                        $.ajax({
+                            type: "GET",
+                            url: this._getPluginPath() + "handler/ApiHandler.ashx?action=GetChatGPTUsers&contactEmail=" + this._contactEmail,
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (result) {
+                                if (result.length > 0) {
+                                    this._contactUsername = result[0]["name"];
+                                    this._reporterCheckboxElement.disabled = false;
+                                    this._reporterCheckboxLabel.style.color = "black";
+                                    this._reporterCheckboxLabel.innerText = this._reporterCheckboxLabel.innerText + " (" + this._contactUsername + ")";
+                                }
+                            }.bind(this),
+                            error: function (err) {
+                                console.log("Have failure in _getContactUsername as ", err);
+                            }.bind(this)
+                        });
+                    }
+                },
+                _renderElement: function () {
+                    var template = document.querySelector('template').content;
+
+                    this._element = window.top.document.importNode(template, true);
+                    var chatgptTemplate = this._element.querySelector(".MarvalSoftware-ChatGPT");
+                    chatgptTemplate.innerHTML = this._preProcessResourceString(chatgptTemplate.innerHTML);
+                    var eventManager = MarvalSoftware.UI.Dom.EventManager.getInstance();
+                    eventManager.addHandler(this._element.querySelector(".header > a"), "click", this._linkElement_click, this);
+                    this._issuesElement = this._element.querySelector(".issues");
+                    this._issuesElement.style.backgroundImage = 'url("' + this._getPluginPath() + '/img/spinner.gif")';
+                    eventManager.addHandler(this._issuesElement, "click", this._issuesElement_click, this);
+                    this._createElement = this._element.querySelector("button");
+                    this._selectAttachmentElement = this._element.querySelector(".selectAttachments");
+                    // this._setSelectedAttachmentCount(0);
+                    eventManager.addHandler(this._createElement, "click", this._createElement_click, this);
+                    this.appendChild(this._element);
+                    this._getChatGPTResponse();
+                    this._getDictionaryList();
+                    this._getNextStatesList();
+                    this._ResolveRequest();
+                },
+                _handleInput: function () {
+                    this._summaryElement.value.length > 0 && this._typeElement.selectedIndex > 0 ? this._createElement.disabled = false : this._createElement.disabled = true;
+                },
+                _renderAttachments: function (container) {
+                    for (var i = 0; i < this._attachments.length; i++) {
+                        var template = document.querySelector(".attachmentTemplate").content;
+                        var templateElement = window.top.document.importNode(template, true);
+                        var attachmentTemplateDiv = templateElement.querySelector(".MarvalSowftware-ChatGPT-Attachments");
+                        attachmentTemplateDiv.innerHTML = this._preProcessResourceString(attachmentTemplateDiv.innerHTML);
+                        var checkboxLabel = templateElement.querySelector(".attachmentLabel");
+                        var checkbox = templateElement.querySelector(".attachmentCheckbox");
+                        checkbox.name = this._getString("@@AttachmentCheckBox");
+                        checkbox.value = this._attachments[i].Identifier;
+                        checkbox.id = this._attachments[i].Name;
+                        checkbox.checked = this._selectedAttachmentIds.indexOf(this._attachments[i].Identifier) > -1 ? true : false;
+                        checkboxLabel.htmlFor = checkbox.id;
+                        checkboxLabel.innerHTML = checkbox.id + " (<strong>Size:</strong> " + (this._attachments[i].Length / 1000) + "kb)";
+                        container.appendChild(templateElement);
+                    }
+                },
+
+                _appendAttachments: function (attachmentIds, issueNumber) {
+                    $.ajax({
+                        type: "POST",
+                        url: this._getPluginPath() + "handler/ApiHandler.ashx?action=SendAttachments&attachments=" + attachmentIds.join(',') + "&issueNumber=" + issueNumber,
+                        contentType: "text/html",
+                        success: function (response) {
+                            this._selectedAttachmentIds = [];
+                            this._setSelectedAttachmentCount(0);
+                        }.bind(this),
+                        error: function (err) {
+                            console.log("Have failure in _createNewIssue as ", err);
+                            this._errorPopup();
+                        }.bind(this)
+                    });
+                },
+                _popup: function () {
+                    if (!this._pluginWindow) {
+                        this._pluginWindow = new MarvalSoftware.UI.Window({
+                            appendToElement: window.top.document.getElementById("aspnetForm"),
+                            title: this._getString("@@PluginDisplayname"),
+                            height: 600,
+                            width: 800,
+                            minHeight: 262,
+                            minWidth: 432,
+                            isResizable: true,
+                            isMaximizable: true,
+                            bodyElement: this
+                        });
+                        if (!this._pluginWindow.isVisible()) {
+                            this._pluginWindow.centerToViewport();
+                        }
+
+                        this._pluginWindow.show();
+                        this._renderElement();
+
+                        if (this._contactEmail != null) {
+                            this._contactUsername = this._getContactUsername();
+                        }
+                    }
+                },
+                _errorPopup: function (result, errorText) {
+                    var errorTemplate = document.querySelector('.errorTemplate').content;
+                    var errorMessages = window.top.document.importNode(errorTemplate, true);
+                    var errorTemplateDiv = errorMessages.querySelector(".MarvalSoftware-ChatGPT-Errors");
+                    errorTemplateDiv.innerHTML = this._preProcessResourceString(errorTemplateDiv.innerHTML);
+                    if (result) {
+                        for (var item in result) {
+                            var id = "#" + item;
+                            errorMessages.querySelector(id).style.display = "block";
+                        }
+                        errorMessages.querySelector('div > h3').textContent = this._getString("@@SettingsNotConfigured");
+                        errorMessages.querySelector('div > h4').textContent = this._getString("@@AddConfigurationViaPluginPage");
+                    }
+                    MarvalSoftware.UI.MessageBox.show(
+                        this._getString("@@InvalidChatGPTConfiguration"),
+                        errorMessages,
+                        MarvalSoftware.UI.MessageBox.Types.ERROR,
+                        [MarvalSoftware.UI.MessageBox.Buttons.OK],
+                        MarvalSoftware.UI.MessageBox.Buttons.OK,
+                        450
+                    );
+                },
+                _getPluginPath: function () {
+                    return this.attributes["data-pluginpath"].value;
+                },
+
+                _getPluginId: function () {
+                    return this.attributes["data-pluginid"].value;
+                },
+
+                _getPluginCulture: function () {
+                    return this.attributes["data-pluginculture"].value;
+                },
+                _getString: function (key, formatObject) {
+                    return MarvalSoftware.Plugins.PluginResourceManager.getInstance().getString(this._getPluginId(), key, this._getPluginCulture(), formatObject);
+                },
+                _getNextStatesList: function () {
+                    var that = this;
+                    $.ajax({
+                        url: that._getPluginPath() + "handler/ApiHandler.ashx?action=GetNextStates&requestID=" + that._requestID,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        type: "GET",
+                        success: function (result) {
+                            console.log("Have data back from _getNextStatesList as ", result);
+                            that._canRequestBeSolved = result.SolvedState;
+                            that._nextStatesList = result;
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            console.log("Status: " + textStatus);
+                            console.log("Error running _getNextStatesList: " + errorThrown);
+                            $("#issueselement").prepend('Error running ChatGPT request ' + errorThrown + ' please try again.');
+                        }
+                    });
+                },
+                _getDictionaryList: function () {
+                    var that = this;
+
+                    $.ajax({
+                        url: that._getPluginPath() + "handler/ApiHandler.ashx?action=GetDictionaryList",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        type: "GET",
+                        success: function (result) {
+                            console.log("Have data back as ", result);
+                            that._dictList = result;
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            console.log("Status: " + textStatus);
+                            console.log("Error running _getDictionaryList: " + errorThrown);
+                            $("#issueselement").prepend('Error running _getDictionaryList in ChatGPT Plugin ' + errorThrown + ' please try again.');
+                        }
+                    });
+                },
+                _getChatGPTResponse: function () {
+                    var that = this;
+                    console.log("RequestID is ", this._requestID);
+
+                    let LatitudeLongitude = new Promise(function (resolve, reject) {
+                        //var textofissue = $('#ctl00_cph_description').html();
+                        console.log("Text is ", that._requestDescription);
+                        $.ajax({
+                            url: that._getPluginPath() + "handler/ApiHandler.ashx?action=GetChatGPTResponse&requestDescription=" + that._requestDescription,
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "text",
+                            type: "GET",
+                            success: function (result) {
+                                try {
+                                    var jsonResult = JSON.parse(result);
+                                    console.log("Have data back as ", jsonResult);
+                                    var textResult = jsonResult.choices[0].message.content;
+                                    var newTextResponse = textResult.replace(/\n/g, "<br>");
+                                    that._chatGPTText = newTextResponse;
+
+                                    $("#issueselement").prepend('<p style="font-family: Söhne,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif,Helvetica Neue,Arial,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-size: 1rem">' + newTextResponse + '</p>');
+                                    $('#issueselement').css('background-image', 'none');
+                                    resolve(jsonResult);
+                                } catch (e) {
+                                    console.log("Error parsing JSON: " + e);
+                                    $("#issueselement").prepend('Error parsing JSON response. Please try again. Response Text is <br> ', result);
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log("Status: " + textStatus);
+                                console.log("Error running _getChatGPTResponse: " + errorThrown);
+                                $("#issueselement").prepend('Error running ChatGPT request ' + errorThrown + ' please try again.');
+                            }
+                        });
+                    })
+
+                },
+                _setUpQuickMenu: function () {
+                    var styleElement = window.top.document.createElement("style");
+                    window.top.document.body.appendChild(styleElement);
+                    styleElement.sheet.insertRule(".MarvalSoftware-ChatGPT-quick-menu-item { background-image: url(" + this._getPluginPath() + "img/chatgpt_32.png); }", 0);
+                    var quickMenuId = window.top.document.querySelector(".quickMenu").id;
+                    var quickMenu = MarvalSoftware.UI.Controls.ScriptManager.getInstance().getControl(quickMenuId);
+                    quickMenu.addMenuItem({
+                        Identifier: "MarvalSoftware-ChatGPT",
+                        Label: this._getString("@@PluginDisplayname"),
+                        HRef: "javascript:void(0);",
+                        CssClass: "MarvalSoftware-ChatGPT-quick-menu-item"
+                    });
+                    quickMenu.onMenuItemClicked.subscribe(function (sender, e) {
+                        if (e.menuItem.getIdentifier() === "MarvalSoftware-ChatGPT") {
+                            this._popup();
+                          //  this._preRequisiteCheck();
+                        }
+                    }, this);
+                },
+                _preRequisiteCheck: function (sender, e) {
+                    $.ajax({
+                        type: "GET",
+                        url: this._getPluginPath() + "handler/ApiHandler.ashx?action=PreRequisiteCheck",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (result) {
+                            if (Object.keys(result).length > 0) {
+                                this._errorPopup(result);
+                            }
+                            else {
+                                this._popup();
+                            }
+                        }.bind(this)
+                    });
+                },
+                _linkElement_click: function () {
+                    console.log("Link element clicked")
+                    $('.richText').append("Test");
+                    var divElement = window.top.document.createElement("DIV");
+                    divElement.innerHTML = this._getString("@@EnterChatGPTIssueNumber");
+                    var aElement = divElement.getElementsByTagName("INPUT")[0];
+                    MarvalSoftware.UI.Dom.EventManager.getInstance().addHandler(aElement, "keypress", function (s, e) {
+                        if (e.keyCode == 13) {
+                            messageBox.dismiss(MarvalSoftware.UI.MessageBox.Buttons.OK);
+                        }
+                    }, this);
+                    aElement.focus();
+                },
+                _issuesElement_click: function (sender, e) {
+                    if (e.target.className == "unlink") {
+                        this._unlinkIssue(e.target.dataset.issueNumber);
+                    }
+                },
+                _typeElement_change: function (sender, e) {
+                    this._createElement.disabled = !this._summaryElement.value.length > 0;
+                },
+                _createElement_click: function (sender, e) {
+                    this._createElement.disabled = true;
+                    e.preventDefault();
+                },
+            });
+    })();
+</script>
+<script>
+    $(document).ready(function () {
+        // When the "openPopup" div is clicked
+        $("body").on("click", "#openPopup", function (e) {
+            //$("#openPopup").click(function() {
+            // Show the popup
+            console.log("Opening popup");
+            $("#popup").show();
+        });
+
+        // When the "Close" button is clicked
+        $("body").on("click", "#closePopup", function (e) {
+            // $("#closePopup").click(function() {
+            // Hide the popup
+            $("#popup").hide();
+        });
+    });
+</script>
